@@ -41,7 +41,7 @@ namespace Platformer397
                     break;
             }
         }
-        public void OnLook(InputAction.CallbackContext context) { }
+       public void OnLook(InputAction.CallbackContext context) { }
        public void OnAttack(InputAction.CallbackContext context) { }
         public void OnInteract(InputAction.CallbackContext context) { }
         public void OnCrouch(InputAction.CallbackContext context) { }

@@ -1,24 +1,37 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Platformer397
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class PlayerControllers : MonoBehaviour
-
     {
         [SerializeField] private InputReader input;
+
+        [SerializeField] private Rigidbody rb;
+        [SerializeField] private Vector3 movement;
+
+        [SerializeField] private float moveSpeed = 200f;
+        [SerializeField] private float rotationsSpeed = 200f;
+        [SerializeField] private Transform mainCam;
+
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
+            rb.freezeRotation = true;
+            mainCam = Camera.main.transform;
+        }
 
         private void Start()
         {
             Debug.Log("[Start]");
-            input.EanblePlayerActions();
+            input.EanblePlayerActions(); // ������ EnablePlayerActions()
         }
 
         private void OnEnable()
         {
             //Debug.Log("[OnEnable]");
             input.Move += GetMovement;
-
-
         }
 
         private void OnDisable()
@@ -27,10 +40,45 @@ namespace Platformer397
             input.Move -= GetMovement;
         }
 
-        private void GetMovement(Vector2 move) 
+        private void FixedUpdate()
         {
-            Debug.Log("Input working" + move);
+            UpdateMovement();
         }
 
+        private void UpdateMovement()
+        {
+            var adjustedDirection = Quaternion.AngleAxis(mainCam.eulerAngles.y, Vector3.up) * movement;
+
+            if (adjustedDirection.magnitude > 0f)
+            {
+                // Handle rotation and movement
+                HandleRotation(adjustedDirection);
+                HandleMovement(adjustedDirection);
+            }
+            else
+            {
+                // Keep vertical velocity for gravity; zero out horizontal movement
+                rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            }
+        }
+
+        private void HandleMovement(Vector3 adjustedMovement)
+        {
+            var velocity = adjustedMovement * moveSpeed * Time.fixedDeltaTime;
+            rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
+        }
+
+        private void HandleRotation(Vector3 adjustedMovement)
+        {
+            var targetRotation = Quaternion.LookRotation(adjustedMovement);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationsSpeed * Time.deltaTime);
+        }
+
+        private void GetMovement(Vector2 move)
+        {
+            Debug.Log("Input working: " + move);
+            movement.x = move.x;
+            movement.z = move.y;
+        }
     }
 }
