@@ -24,7 +24,7 @@ namespace Platformer397
 
         private void Start()
         {
-            Debug.Log("[Start]");
+            //Debug.Log("[Start]");
             input.EanblePlayerActions(); // ������ EnablePlayerActions()
         }
 
@@ -76,7 +76,7 @@ namespace Platformer397
 
         private void GetMovement(Vector2 move)
         {
-            Debug.Log("Input working: " + move);
+            //Debug.Log("Input working: " + move);
             movement.x = move.x;
             movement.z = move.y;
         }
